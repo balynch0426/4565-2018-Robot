@@ -7,15 +7,15 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
+
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -35,6 +35,7 @@ public class Robot extends TimedRobot {
   PWMTalonSRX frontRightDrive;
   PWMTalonSRX backLeftDrive;
   PWMTalonSRX backRightDrive;
+  TalonSRX beans = new TalonSRX(1);
 
 
   SpeedControllerGroup leftDrive;
