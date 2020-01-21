@@ -7,11 +7,9 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
 import edu.wpi.first.wpilibj.GenericHID.Hand;
-
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
-import edu.wpi.first.wpilibj.PWMTalonSRX;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
@@ -31,11 +29,10 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 */
-  PWMTalonSRX frontLeftDrive;
-  PWMTalonSRX frontRightDrive;
-  PWMTalonSRX backLeftDrive;
-  PWMTalonSRX backRightDrive;
-  TalonSRX beans = new TalonSRX(1);
+  WPI_TalonSRX frontLeftDrive;
+  WPI_TalonSRX frontRightDrive;
+  WPI_TalonSRX backLeftDrive;
+  WPI_TalonSRX backRightDrive;
 
 
   SpeedControllerGroup leftDrive;
@@ -55,13 +52,13 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
     */
     //create left speed drivers
-    frontLeftDrive = new PWMTalonSRX(0); //green is left
-    backLeftDrive = new PWMTalonSRX(1); //orange is left
+    frontLeftDrive = new WPI_TalonSRX(0); //green is left
+    backLeftDrive = new WPI_TalonSRX(1); //orange is left
     leftDrive = new SpeedControllerGroup(frontLeftDrive, backLeftDrive);
     
     //create right speed drivers
-    frontRightDrive = new PWMTalonSRX(2); //pink is a right motor
-    backRightDrive = new PWMTalonSRX(3); //yellow too
+    frontRightDrive = new WPI_TalonSRX(2); //pink is a right motor
+    backRightDrive = new WPI_TalonSRX(3); //yellow too
     rightDrive = new SpeedControllerGroup(frontRightDrive, backRightDrive);
 
     //the whole boi in one
