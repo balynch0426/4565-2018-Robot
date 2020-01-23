@@ -52,13 +52,13 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
     */
     //create left speed drivers
-    frontLeftDrive = new WPI_TalonSRX(0); //green is left
-    backLeftDrive = new WPI_TalonSRX(1); //orange is left
+    frontLeftDrive = new WPI_TalonSRX(4); //sticker says LF and is pink
+    backLeftDrive = new WPI_TalonSRX(5); //sticker says Lb and is orange
     leftDrive = new SpeedControllerGroup(frontLeftDrive, backLeftDrive);
     
     //create right speed drivers
-    frontRightDrive = new WPI_TalonSRX(2); //pink is a right motor
-    backRightDrive = new WPI_TalonSRX(3); //yellow too
+    frontRightDrive = new WPI_TalonSRX(8); //sticker says RF and is yellow
+    backRightDrive = new WPI_TalonSRX(9); //sticker says RB and is pink
     rightDrive = new SpeedControllerGroup(frontRightDrive, backRightDrive);
 
     //the whole boi in one
