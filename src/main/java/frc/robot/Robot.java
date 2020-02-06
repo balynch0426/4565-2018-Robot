@@ -34,6 +34,8 @@ public class Robot extends TimedRobot {
   WPI_TalonSRX backLeftDrive;
   WPI_TalonSRX backRightDrive;
 
+  double YAxis;
+  double XAxis;
 
   SpeedControllerGroup leftDrive;
   SpeedControllerGroup rightDrive;
@@ -53,7 +55,7 @@ public class Robot extends TimedRobot {
     */
     //create left speed drivers
     frontLeftDrive = new WPI_TalonSRX(4); //sticker says LF and is pink
-    backLeftDrive = new WPI_TalonSRX(5); //sticker says Lb and is orange
+    backLeftDrive = new WPI_TalonSRX(5); //sticker says LB and is orange
     leftDrive = new SpeedControllerGroup(frontLeftDrive, backLeftDrive);
     
     //create right speed drivers
@@ -66,6 +68,9 @@ public class Robot extends TimedRobot {
 
     //controller, first one plugged in
     joystick = new XboxController(0);
+
+    YAxis = 0;
+    XAxis = 0;
   }
 
   /**
@@ -123,7 +128,25 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    driveTrain.arcadeDrive(-joystick.getY(Hand.kLeft), joystick.getX(Hand.kRight));
+
+    YAxis = (-joystick.getY(Hand.kLeft)); //left stick's Y Axis
+    XAxis = (joystick.getX(Hand.kRight)); //Right stick's X axis
+
+    //square function for inputs on Y Axis
+    if (YAxis < 0){
+      YAxis = -(YAxis * YAxis);
+    }else{
+      YAxis = (YAxis * YAxis);
+    }
+
+    //square function for inputs on X Axis
+    if (XAxis < 0){
+      XAxis = -(XAxis * XAxis);
+    }else{
+      XAxis = (XAxis * XAxis);
+    }
+    
+    driveTrain.arcadeDrive(YAxis, XAxis);
     //stop the timeout timer
     driveTrain.feed();
   }
