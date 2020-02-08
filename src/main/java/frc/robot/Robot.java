@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
     //controller, first one plugged in
     joystick = new XboxController(0);
 
-    RightStick_RightStick_YAxis = 0;
+    RightStick_YAxis = 0;
     LeftStick_XAxis = 0;
   }
 
