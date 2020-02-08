@@ -34,8 +34,8 @@ public class Robot extends TimedRobot {
   WPI_TalonSRX backLeftDrive;
   WPI_TalonSRX backRightDrive;
 
-  double YAxis;
-  double XAxis;
+  double RightStick_YAxis; //Throttle on Right Stick
+  double LeftStick_XAxis; //Turning on Left Stick
 
   SpeedControllerGroup leftDrive;
   SpeedControllerGroup rightDrive;
@@ -69,8 +69,8 @@ public class Robot extends TimedRobot {
     //controller, first one plugged in
     joystick = new XboxController(0);
 
-    YAxis = 0;
-    XAxis = 0;
+    RightStick_RightStick_YAxis = 0;
+    LeftStick_XAxis = 0;
   }
 
   /**
@@ -129,24 +129,28 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    YAxis = (-joystick.getY(Hand.kLeft)); //left stick's Y Axis
-    XAxis = (joystick.getX(Hand.kRight)); //Right stick's X axis
+    RightStick_YAxis = (-joystick.getY(Hand.kRight)); //left stick's Y Axis
+    LeftStick_XAxis = (joystick.getX(Hand.kLeft)); //Right stick's X axis
 
     //square function for inputs on Y Axis
-    if (YAxis < 0){
-      YAxis = -(YAxis * YAxis);
+    if (RightStick_YAxis < 0){
+      RightStick_YAxis = -(RightStick_YAxis * RightStick_YAxis);
     }else{
-      YAxis = (YAxis * YAxis);
+      RightStick_YAxis = (RightStick_YAxis * RightStick_YAxis);
     }
 
     //square function for inputs on X Axis
-    if (XAxis < 0){
-      XAxis = -(XAxis * XAxis);
+    if (LeftStick_XAxis < 0){
+      LeftStick_XAxis = -(LeftStick_XAxis * LeftStick_XAxis);
     }else{
-      XAxis = (XAxis * XAxis);
+      LeftStick_XAxis = (LeftStick_XAxis * LeftStick_XAxis);
+    }
+
+    if (joystick.getXButtonPressed()){
+      System.out.println("PRESSED");
     }
     
-    driveTrain.arcadeDrive(YAxis, XAxis);
+    driveTrain.arcadeDrive(RightStick_YAxis, LeftStick_XAxis);
     //stop the timeout timer
     driveTrain.feed();
   }
