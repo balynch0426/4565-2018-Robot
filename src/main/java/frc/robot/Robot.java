@@ -34,6 +34,8 @@ public class Robot extends TimedRobot {
   WPI_TalonSRX backLeftDrive;
   WPI_TalonSRX backRightDrive;
 
+  double RightStick_YAxis; //Throttle on Right Stick
+  double LeftStick_XAxis; //Turning on Left Stick
 
   SpeedControllerGroup leftDrive;
   SpeedControllerGroup rightDrive;
@@ -53,7 +55,7 @@ public class Robot extends TimedRobot {
     */
     //create left speed drivers
     frontLeftDrive = new WPI_TalonSRX(4); //sticker says LF and is pink
-    backLeftDrive = new WPI_TalonSRX(5); //sticker says Lb and is orange
+    backLeftDrive = new WPI_TalonSRX(5); //sticker says LB and is orange
     leftDrive = new SpeedControllerGroup(frontLeftDrive, backLeftDrive);
     
     //create right speed drivers
@@ -66,6 +68,9 @@ public class Robot extends TimedRobot {
 
     //controller, first one plugged in
     joystick = new XboxController(0);
+
+    RightStick_RightStick_YAxis = 0;
+    LeftStick_XAxis = 0;
   }
 
   /**
@@ -123,7 +128,29 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    driveTrain.arcadeDrive(-joystick.getY(Hand.kLeft), joystick.getX(Hand.kRight));
+
+    RightStick_YAxis = (-joystick.getY(Hand.kRight)); //left stick's Y Axis
+    LeftStick_XAxis = (joystick.getX(Hand.kLeft)); //Right stick's X axis
+
+    //square function for inputs on Y Axis
+    if (RightStick_YAxis < 0){
+      RightStick_YAxis = -(RightStick_YAxis * RightStick_YAxis);
+    }else{
+      RightStick_YAxis = (RightStick_YAxis * RightStick_YAxis);
+    }
+
+    //square function for inputs on X Axis
+    if (LeftStick_XAxis < 0){
+      LeftStick_XAxis = -(LeftStick_XAxis * LeftStick_XAxis);
+    }else{
+      LeftStick_XAxis = (LeftStick_XAxis * LeftStick_XAxis);
+    }
+
+    if (joystick.getXButtonPressed()){
+      System.out.println("PRESSED");
+    }
+    
+    driveTrain.arcadeDrive(RightStick_YAxis, LeftStick_XAxis);
     //stop the timeout timer
     driveTrain.feed();
   }
