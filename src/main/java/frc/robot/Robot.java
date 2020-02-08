@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -33,6 +34,7 @@ public class Robot extends TimedRobot {
   WPI_TalonSRX frontRightDrive;
   WPI_TalonSRX backLeftDrive;
   WPI_TalonSRX backRightDrive;
+  WPI_TalonSRX bottomPitchClawControl;
 
   double RightStick_YAxis; //Throttle on Right Stick
   double LeftStick_XAxis; //Turning on Left Stick
@@ -41,6 +43,10 @@ public class Robot extends TimedRobot {
   SpeedControllerGroup rightDrive;
   DifferentialDrive driveTrain;
   XboxController joystick;
+
+  Timer clawTime;
+
+  boolean orientation;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -68,6 +74,15 @@ public class Robot extends TimedRobot {
 
     //controller, first one plugged in
     joystick = new XboxController(0);
+
+    //make the claw control exist
+    bottomPitchClawControl = new WPI_TalonSRX(2);
+
+    //true = up
+    orientation = true;
+
+    //claw timer, AKA claw time
+    clawTime = new Timer();
 
     RightStick_YAxis = 0;
     LeftStick_XAxis = 0;
@@ -145,11 +160,29 @@ public class Robot extends TimedRobot {
     }else{
       LeftStick_XAxis = (LeftStick_XAxis * LeftStick_XAxis);
     }
+    bottomPitchClawControl.feed();
 
+    //check for x button press
     if (joystick.getXButtonPressed()){
-      System.out.println("PRESSED");
+      clawTime.start();
+      if(orientation){
+        bottomPitchClawControl.set(-0.15);
+        System.out.println(clawTime.get() + " is starting from up");
+        orientation = false;
+      }else{
+        bottomPitchClawControl.set(0.15);
+        System.out.println(clawTime.get() + " is starting from down");
+        orientation = true;
+      }
     }
-    
+
+    if(clawTime.get() > 5){
+      bottomPitchClawControl.set(0);
+      System.out.println(clawTime.get() + " is toggled");
+      clawTime.stop();
+      clawTime.reset();
+    }
+
     driveTrain.arcadeDrive(RightStick_YAxis, LeftStick_XAxis);
     //stop the timeout timer
     driveTrain.feed();
