@@ -10,10 +10,12 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 /**
@@ -44,9 +46,12 @@ public class Robot extends TimedRobot {
   DifferentialDrive driveTrain;
   XboxController joystick;
 
+  DoubleSolenoid claw;
+
   Timer clawTime;
 
   boolean orientation;
+  boolean clawIsOpen;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -80,12 +85,16 @@ public class Robot extends TimedRobot {
 
     //true = up
     orientation = true;
+    clawIsOpen = true;
 
     //claw timer, AKA claw time
     clawTime = new Timer();
 
     RightStick_YAxis = 0;
     LeftStick_XAxis = 0;
+
+    //the claw gripper
+    claw = new DoubleSolenoid(0, 7);
   }
 
   /**
@@ -160,31 +169,47 @@ public class Robot extends TimedRobot {
     }else{
       LeftStick_XAxis = (LeftStick_XAxis * LeftStick_XAxis);
     }
+
+    //stop the claw pitch timeout counter
     bottomPitchClawControl.feed();
 
     //check for x button press
     if (joystick.getXButtonPressed()){
-      clawTime.start();
-      if(orientation){
+      clawTime.start();//start the timer
+      if(orientation){//if up top, then go down
         bottomPitchClawControl.set(-0.15);
-        System.out.println(clawTime.get() + " is starting from up");
-        orientation = false;
+        //System.out.println(clawTime.get() + " is starting from up");
+        orientation = false;//now assumed to be down
       }else{
-        bottomPitchClawControl.set(0.15);
-        System.out.println(clawTime.get() + " is starting from down");
-        orientation = true;
+        bottomPitchClawControl.set(0.15);//go up if down
+        //System.out.println(clawTime.get() + " is starting from down");
+        orientation = true;//now assumed to be up
       }
     }
 
-    if(clawTime.get() > 5){
-      bottomPitchClawControl.set(0);
-      System.out.println(clawTime.get() + " is toggled");
-      clawTime.stop();
-      clawTime.reset();
+    if (joystick.getBButtonPressed()){
+      claw.set(Value.kOff);
+    }
+
+    if(joystick.getAButtonPressed()){
+      if (clawIsOpen){
+        claw.set(Value.kForward);
+        clawIsOpen = false;
+      }else{
+        claw.set(Value.kReverse);
+        clawIsOpen = true;
+      }
+    }
+
+    if(clawTime.get() > 5){//if 5 seconds have passed, then:
+      bottomPitchClawControl.set(0);//stop the claw's pitch
+      //System.out.println(clawTime.get() + " is toggled");
+      clawTime.stop();//stop the counter
+      clawTime.reset();//set counter to zero
     }
 
     driveTrain.arcadeDrive(RightStick_YAxis, LeftStick_XAxis);
-    //stop the timeout timer
+    //stop the motor timeout timer
     driveTrain.feed();
   }
 
