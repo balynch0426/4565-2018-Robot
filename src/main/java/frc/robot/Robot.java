@@ -44,14 +44,16 @@ public class Robot extends TimedRobot {
   SpeedControllerGroup leftDrive;
   SpeedControllerGroup rightDrive;
   DifferentialDrive driveTrain;
-  XboxController joystick;
+  XboxController drive_xbox;
+  XboxController control_xbox;
 
   DoubleSolenoid claw;
 
+  Timer autonomousDriveTime;
   Timer clawTime;
 
-  boolean orientation;
-  boolean clawIsOpen;
+  boolean clawPitchIsToggled;
+  boolean clawIsToggled;
 
   /**
    * This function is run when the robot is first started up and should be
@@ -78,23 +80,28 @@ public class Robot extends TimedRobot {
     driveTrain = new DifferentialDrive(leftDrive, rightDrive);
 
     //controller, first one plugged in
-    joystick = new XboxController(0);
+    drive_xbox = new XboxController(0);
+    control_xbox = new XboxController(1);
 
     //make the claw control exist
     bottomPitchClawControl = new WPI_TalonSRX(2);
 
     //true = up
-    orientation = true;
-    clawIsOpen = true;
+    clawPitchIsToggled = true;
+    clawIsToggled = true;
 
-    //claw timer, AKA claw time
+    //timers
     clawTime = new Timer();
+    autonomousDriveTime = new Timer();
 
     RightStick_YAxis = 0;
     LeftStick_XAxis = 0;
 
     //the claw gripper
     claw = new DoubleSolenoid(0, 7);
+
+    //open the claw
+    //claw.set(Value.kForward);
   }
 
   /**
@@ -127,6 +134,12 @@ public class Robot extends TimedRobot {
     // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
     System.out.println("Auto selected: " + m_autoSelected);
     */
+
+    autonomousDriveTime.start();
+    System.out.println("The timer is started");
+    driveTrain.arcadeDrive(0.5, 0);
+    System.out.println("driveTrain set");
+
   }
 
   /**
@@ -145,6 +158,15 @@ public class Robot extends TimedRobot {
         break;
     }
     */
+
+    if (autonomousDriveTime.get() > 7.5){
+      driveTrain.arcadeDrive(0, 0);
+      System.out.println("driveTrain stopped");
+      autonomousDriveTime.stop();
+      autonomousDriveTime.reset();
+    }
+    driveTrain.feed();
+
   }
 
   /**
@@ -153,8 +175,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    RightStick_YAxis = (-joystick.getY(Hand.kRight)); //left stick's Y Axis
-    LeftStick_XAxis = (joystick.getX(Hand.kLeft)); //Right stick's X axis
+    RightStick_YAxis = (-drive_xbox.getY(Hand.kRight)); //left stick's Y Axis
+    LeftStick_XAxis = (drive_xbox.getX(Hand.kLeft)); //Right stick's X axis
 
     //square function for inputs on Y Axis
     if (RightStick_YAxis < 0){
@@ -174,30 +196,26 @@ public class Robot extends TimedRobot {
     bottomPitchClawControl.feed();
 
     //check for x button press
-    if (joystick.getXButtonPressed()){
+    if (control_xbox.getXButtonPressed()){
       clawTime.start();//start the timer
-      if(orientation){//if up top, then go down
+      if(clawPitchIsToggled){//if up top, then go down
         bottomPitchClawControl.set(-0.15);
         //System.out.println(clawTime.get() + " is starting from up");
-        orientation = false;//now assumed to be down
+        clawPitchIsToggled = false;//now assumed to be down
       }else{
         bottomPitchClawControl.set(0.15);//go up if down
         //System.out.println(clawTime.get() + " is starting from down");
-        orientation = true;//now assumed to be up
+        clawPitchIsToggled = true;//now assumed to be up
       }
     }
 
-    if (joystick.getBButtonPressed()){
-      claw.set(Value.kOff);
-    }
-
-    if(joystick.getAButtonPressed()){
-      if (clawIsOpen){
+    if(control_xbox.getAButtonPressed()){
+      if (clawIsToggled){
         claw.set(Value.kForward);
-        clawIsOpen = false;
+        clawIsToggled = false;
       }else{
         claw.set(Value.kReverse);
-        clawIsOpen = true;
+        clawIsToggled = true;
       }
     }
 
